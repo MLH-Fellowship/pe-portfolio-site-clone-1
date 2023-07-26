@@ -2,7 +2,7 @@ import os
 import datetime
 from peewee import *
 from playhouse.shortcuts import model_to_dict
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request,redirect, url_for
 from dotenv import load_dotenv
 
 
@@ -43,13 +43,18 @@ def experience():
 def hobbies():
     return render_template('hobbies.html', hobby2="Photography")
 
+@app.route('/timeline')
+def timeline():
+    timeline_posts = TimelinePost.select().order_by(TimelinePost.created_at.desc())
+    return render_template('timeline.html', timeline_posts=timeline_posts)
+
 @app.route('/api/timeline_post', methods=['POST'])
 def post_time_line_post():
     name = request.form['name']
     email = request.form['email']
     content = request.form['content']
     timeline_post = TimelinePost.create(name=name,email=email,content=content)
-    return model_to_dict(timeline_post)
+    return redirect(url_for('timeline'))
 
 @app.route('/api/timeline_post', methods=['GET'])
 def get_time_line_post():
